@@ -3,9 +3,15 @@
 
 A Windows tool for tracking Twitch followers over time.
 
-![alt text](https://github.com/DarkKrimson/Bulk-CSV-Follower-Reporter/Program_Preview.PNG "Bulk CSV Follower Reporter.exe")
+![alt text](https://github.com/DarkKrimson/Bulk-CSV-Follower-Reporter/blob/master/Program_Preview.PNG "Bulk CSV Follower Reporter.exe")
 
-**Bulk CSV Follower Reporter** (window app): compares many follower-list CSV exports, shows who left, came back, changed names, and more. It can also look up current Twitch usernames by user ID, and compare two channels to find the follower overlap between two channels.
+**Bulk CSV Follower Reporter**: can quickly analyze many follower list .CSV files exported using https://twitch-tools.rootonline.de/followerlist_viewer.php. It will create lists of who unfollowed, re-followed, changed their username, and more.
+
+You will need to save a few of these over time to capture enough data to see changes so by getting your initial .CSV today and then wait some time and grab another .CSV file to see results. It's good practice to remember to save your follower .CSV weekly, monthly, or yearly to get the full benefit of this program. The more .CSV files you have, the better the results will be
+
+If you want to start using the program today, you can try the compare function. It can compare two different channels to find the follower overlap or followers in common.
+
+Now you and your homie can answer the question, how many followers do we have in common?
 
 ---
 
@@ -30,7 +36,7 @@ Keep these files in the same folder.
 
 ---
 
-## Building the window app (Windows)
+## Building the Windows executable.
 
 1. Put `followers_gui.py`, `followers_report.py`, and `twitch_lookup.py` in one folder, for example `C:\BulkCSVReporter`.
 2. Open Command Prompt in that folder: click the address bar in Explorer, type `cmd`, and press Enter.
@@ -68,7 +74,7 @@ The exe is at `dist\followers_report.exe`. Drag CSV files or a folder onto it, o
 
 ---
 
-## Running the window app
+## Using the program
 
 Double-click `BulkCSVFollowerReporter.exe`. The window has two areas.
 
@@ -102,24 +108,22 @@ The report folder contains:
 | `unfollowed_now.csv` | Accounts seen in an earlier export that aren't in the latest one. Shows the name they had before leaving. |
 | `returned_followers.csv` | Accounts that left at some point and then came back. Shows the name before leaving and the name now. |
 | `changed_username.csv` | Accounts that changed their username between exports. Sorted by current name. |
-| `bots.csv` | Accounts the viewer flagged as known bots. |
-| `affiliates.csv` | Every affiliate account seen, and whether it still follows. |
-| `partners.csv` | Every partner account seen, and whether it still follows. |
+| `bots.csv` | Accounts that are flagged as known bots by CommanderRoot. |
+| `affiliates.csv` | Every Twitch Affiliate account seen, and whether it still follows. |
+| `partners.csv` | Every Twitch Partner account seen, and whether it still follows. |
 | `fast_follows.csv` | Accounts that followed within 10 minutes of creating their account. |
-| `current_names.csv` | Only if the Twitch lookup ran. The current name for every account. |
+| `current_names.csv` | Only if the Twitch lookup ran. The current name for every account and all their past username changes. |
 | `timeline.csv` | Follower counts and changes for each export. |
 
-**Sorting:** in most files, accounts that are no longer following you appear first, and each group is sorted by name. In `current_names.csv`, rows are grouped in this order:
+**Sorting:** in most files follow a group hierarchy of these criteria:
 
 1. "not found on Twitch" (the account was deleted or suspended)
-2. "not in latest export"
+2. "not in latest export" (not following as of your newest CSV)
 3. "following"
 
-Each group is sorted by the current Twitch name, or by the export name if the Twitch name isn't available.
+Each group is then sorted A-Z by current username (if the Twitch lookup ran) and if not, the username from the .CSV export will be used.
 
-**Columns:** each file has the user ID and the names the account used. If the Twitch lookup ran, most files also have a `current_username_on_twitch` column.
-
-**Important:** an account missing from an export may have unfollowed you, or been banned, deleted, or renamed. The exports don't say which.
+Usernames missing from your .CSV export may have unfollowed, been banned, deleted their account, changed this username, or you removed them as a follower using https://twitch-tools.rootonline.de/follower_remover.php. It is difficult to know but with this tool we can see if accounts are still intact or suspended/banned. The tool also uses user ID's to avoid considering a follower who changed their username as an unfollow. Changing your username, doesn't change your ID. It's static and never changes. This give us confirmation that user is either following but by a different name, or they did in fact unfollow.
 
 ---
 
@@ -141,17 +145,24 @@ Channel names come from the file names. If a file name doesn't use the `follower
 
 ## The Twitch lookup
 
-The lookup uses the Twitch API to fill in current usernames for user IDs in your reports. It's optional.
+The lookup uses the Twitch API to look up user IDs to find the current username. This is optional step but recommended for the best results.
 
-Set it up once:
+How to get your Client ID and Secret ID:
 
-1. Create an application at https://dev.twitch.tv/console/apps and copy its Client ID.
-2. Generate a Client Secret.
-3. In the window app, tick **Look up current usernames on Twitch**, enter both values, and click **Save to config.ini**.
+1. Create an application at https://dev.twitch.tv/console/apps
 
-The file contains your secret. Keep it private, and don't share it or zip it with the exe.
+   ```
+   Name: This can be anything you want
+   OAuth Redirect URLs: This isn't important either. It can be left as http://localhost
+   Category: Analytic Tools
+   Client Type: Confidential
+   
+2. In the Windows app, tick **Look up current usernames on Twitch**, copy & paste both the Client ID and Secret ID, and click **Save to config.ini**.
 
-If the lookup can't run, the report still finishes. The log and summary say why, such as "config.ini still has the placeholder values."
+NOTE: Config.ini will be be saved in the same directory as your .exe. Keep it private, and don't share it or zip it with the exe.
+Anyone with the Client ID and Secret ID can use them to run other unrelated programs on your behalf.
+
+If the lookup can't run, the report will still finish. The log and summary will say why, for example "config.ini still has the placeholder values."
 
 ---
 
@@ -169,7 +180,7 @@ If the lookup can't run, the report still finishes. The log and summary say why,
 
 ## Privacy and safety
 
-- `config.ini` holds your Twitch secret. Keep it private.
+- `config.ini` holds your Twitch Client ID and Secret ID. Keep it private!
 
 ---
 
